@@ -12,3 +12,15 @@ class Scheduler():
     def __init__(self, reconfig_penalty):
         
         self.reconfig_penalty = reconfig_penalty
+        
+    def readyToSchedule():
+        
+        
+    def schedule():
+        
+    def getNextConfig():
+        
+        
+        
+        
+    

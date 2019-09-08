@@ -28,7 +28,15 @@ class Switch():
             self.reconfig_delay = self.reconfig_delay - 1
             return 
         
-        if self.currConfig == None
-        
-        
+        if self.currConfig == None:
+            self.currConfig = self.switch_scheduler.getNextConfig()
+            
+        if self.currConfig != None and self.currConfig.timeDuration > 0:
+            self.demand.serveDemand(self.currConfig)
+            self.currConfig.service()
+            
+            if self.currConfig.timeDuration == 0:
+                
+                self.currConfig = None
+                self.reconfig_delay = self.reconfig_penalty
         
