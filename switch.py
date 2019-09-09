@@ -14,7 +14,7 @@ class Switch():
         
         self.switchRadix = switchRadix
         self.reconfig_penalty = reconfig_penalty
-        self.switch_scheduler = Scheduler(reconfig_penalty)
+        self.switch_scheduler = Scheduler(switchRadix, reconfig_penalty)
         self.demand = Timeline(timeline_params)
         self.reconfig_delay = reconfig_penalty
         self.currConfig = None
@@ -39,4 +39,4 @@ class Switch():
                 
                 self.currConfig = None
                 self.reconfig_delay = self.reconfig_penalty
-        
+                

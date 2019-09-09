@@ -5,7 +5,7 @@ Created on Sun Sep  8 15:17:18 2019
 @author: yellemetal
 """
 
-from intertools import count
+from itertools import count
 
 class Flow():
     _ids = count(0)
