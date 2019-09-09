@@ -6,8 +6,12 @@ Created on Sun Sep  8 15:35:37 2019
 """
 
 import numpy as np
+from datetime import datetime
 
 def Sparse_Matrix_Generator(size, num_light_flows, num_heavy_flows, light_range, heavy_range):
+    
+    now = (datetime.now()-datetime(1970,1,1)).total_seconds()
+    np.random.seed(int(now))
     
     matrix = np.zeros((size,size))
     rand_idx = np.arange(size)
