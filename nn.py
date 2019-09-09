@@ -414,6 +414,8 @@ def check_accuracy(model):
       t += 1
       averageSlowdown += -1 * loss
     print("Average slowdown : " + str(averageSlowdown / m.NumJobsArrived()))
+    
+# https://github.com/pytorch/examples/blob/master/reinforcement_learning/reinforce.py
 
 class FourLayerFC(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
