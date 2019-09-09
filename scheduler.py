@@ -20,23 +20,22 @@ class Scheduler():
         self.reconfig_penalty = reconfig_penalty
         
         self.config_queue = ConfigQueue(self.switchRadix)
-        self.schduler = lumos
+        self.scheduler = lumos
         
         self.runtimeDelay = 0
         self.schedulingDelay = TRIVIAL
         
     def readyToSchedule(self):
         
-        return self.runtimeDelay == 0 and self.schedulingDelay == 0
+        return self.runtimeDelay <= 0 and self.schedulingDelay <= 0
         
         
-    def schedule(self, demandMatrix):
+    def scheduleDemand(self, demandMatrix):
         
-        if np.array_equal(demandMatrix, np.zeros((self.switchRadix,self.switchRadix))):
-            return
+        if demandMatrix.any():
         
-        self.schedule, self.runtimeDelay = self.schduler(demandMatrix, self.reconfig_penalty)
-        self.schedulingDelay = max(TRIVIAL, self.runtimeDelay)
+            self.schedule, self.runtimeDelay = self.scheduler(demandMatrix, self.reconfig_penalty)
+            self.schedulingDelay = max(TRIVIAL, self.runtimeDelay)
         
         
     def getNextConfig(self):
@@ -52,7 +51,7 @@ class Scheduler():
         if self.runtimeDelay > 0:
              self.runtimeDelay = self.runtimeDelay - 1
              
-             if self.runtimeDelay == 0:
+             if self.runtimeDelay <= 0:
                  self.config_queue.enqueue(self.schedule)
                  self.schedule = None
                  

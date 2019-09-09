@@ -33,6 +33,11 @@ class Flow():
     def getTimeWaiting(self, curr_timestamp):
         
         return curr_timestamp - self.timestamp
+    
+    def getStats(self):
+        
+        return {'id' : self.id, 'size' : self.size, 'timestamp' : self.timestamp,  
+                'src' : self.src, 'dst' : self.dst, 'flowCompletionTime' : self.flowCompletionTime}
         
         
         

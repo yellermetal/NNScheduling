@@ -22,7 +22,8 @@ class Switch():
     def update(self, clock):
         
         if self.switch_scheduler.readyToSchedule():
-            self.switch_scheduler.schedule(self.demand.getDemand())
+            demandMatrix = self.demand.getDemand()
+            self.switch_scheduler.scheduleDemand(demandMatrix)
             
         if self.reconfig_delay > 0:
             self.reconfig_delay = self.reconfig_delay - 1

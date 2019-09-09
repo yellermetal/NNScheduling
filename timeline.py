@@ -59,7 +59,7 @@ class Timeline():
         for flow in self.flows:
             
             if flow.remainingSize > 0 and \
-               flow.src == config.permMatrix[flow.dst] and \
+               config.permMatrix[flow.src][flow.dst] == 1 and \
                flow.timestamp <= self.currTime and \
                flow_serviced[flow.src] == 0:
                    
