@@ -9,8 +9,6 @@ from SMG import Sparse_Matrix_Generator
 from flow import Flow
 import numpy as np
 
-WINDOW_NUM = 30
-
 class Timeline():
     
     def __init__(self, timeline_params):
@@ -20,7 +18,7 @@ class Timeline():
         self.flowNumber = 0
         self.flows = []
         
-        for time in np.arange(WINDOW_NUM)*timeline_params['time_window']:
+        for time in np.arange(timeline_params['window_num'])*timeline_params['time_window']:
             
             SMG_mat = Sparse_Matrix_Generator(self.switchRadix, timeline_params['light_flows_num'],
                                                                 timeline_params['heavy_flows_num'],
@@ -51,6 +49,22 @@ class Timeline():
                    flow.markedForScheduling = True
                    
         return demandMatrix
+    
+    def getState(self):
+        
+        demandMatrix = np.zeros((self.switchRadix, self.switchRadix))
+        
+        for flow in self.flows:
+            
+            if flow.markedForScheduling == False and \
+               flow.timestamp <= self.currTime and \
+               flow.remainingSize > 0:
+                   
+                                      
+                   demandMatrix[flow.src][flow.dst] = demandMatrix[flow.src][flow.dst] + flow.remainingSize
+                   
+        return demandMatrix
+        
     
     def serveDemand(self, config):
         
@@ -83,6 +97,21 @@ class Timeline():
         
     def isEmpty(self):
         return self.flowNumber == 0
+    
+    def calcReward(self):
+        
+        total_reward = 0
+        
+        for flow in self.flows:
+            
+            if flow.timestamp <= self.currTime:
+                total_reward = total_reward + flow.size - flow.remainingSize
+                
+        return total_reward
+    
+    def aggregateResults(self):
+        return [flow.getStats() for flow in self.flows]
+        
     
     def update(self, clock):
         self.currTime = clock

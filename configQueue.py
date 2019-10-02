@@ -45,6 +45,8 @@ class ConfigQueue():
             new_queue.put(config)
             
         self.queue = new_queue
+        
+        return sumDCT
             
         
         

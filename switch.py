@@ -21,7 +21,7 @@ class Switch():
         
     def update(self, clock):
         
-        if self.switch_scheduler.readyToSchedule():
+        if self.switch_scheduler.readyToSchedule(self.demand):
             demandMatrix = self.demand.getDemand()
             self.switch_scheduler.scheduleDemand(demandMatrix)
             

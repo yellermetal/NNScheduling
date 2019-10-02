@@ -9,15 +9,11 @@ Created on Mon Sep  9 10:13:32 2019
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 from torch.distributions import Categorical
-
-import numpy as np
-
 gamma = 1
 
 class Policy(nn.Module):
-    def __init__(self, input_size, num_hidden_layers, hidden_size):
+    def __init__(self, input_size, hidden_size):
         super(Policy, self).__init__()
         
         self.in_layer = nn.Linear(input_size, hidden_size)        
@@ -32,7 +28,7 @@ class Policy(nn.Module):
         x = F.relu(self.in_layer(x))
         x = F.relu(self.hidden_layer_1(x))
         x = F.relu(self.hidden_layer_2(x))
-        return F.softmax(self.out_layer(x), dim = 1)
+        return self.out_layer(x)
     
 
 
@@ -56,7 +52,7 @@ def finish_episode(policy, optimizer, eps):
     for log_prob, R in zip(policy.saved_log_probs, returns):
         policy_loss.append(-log_prob * R)
     optimizer.zero_grad()
-    policy_loss = torch.cat(policy_loss).sum()
+    policy_loss = torch.stack(policy_loss).sum()
     policy_loss.backward()
     optimizer.step()
     del policy.rewards[:]
@@ -64,8 +60,11 @@ def finish_episode(policy, optimizer, eps):
 
 
         
+'''
+input_size = 4
+hidden_size = 4
 
-
-policy = Policy()
+policy = Policy(input_size, hidden_size)
 optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 eps = np.finfo(np.float32).eps.item()
+'''

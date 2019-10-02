@@ -9,12 +9,15 @@ TRIVIAL = 3000
 
 from scheduler_c import lumos
 from configQueue import ConfigQueue
+from policy import select_action
+from torch import Tensor
+from Queue import Queue
 
 import numpy as np
 
 class Scheduler():
     
-    def __init__(self, switchRadix, reconfig_penalty):
+    def __init__(self, switchRadix, reconfig_penalty, policy = None):
         
         self.switchRadix = switchRadix
         self.reconfig_penalty = reconfig_penalty
@@ -24,10 +27,24 @@ class Scheduler():
         
         self.runtimeDelay = 0
         self.schedulingDelay = TRIVIAL
+        self.policy = policy
+        self.baseline_reward = Queue()
+         
+    def readyToSchedule(self, demand):
         
-    def readyToSchedule(self):
+        if self.policy is None:
+            self.baseline_reward.put(demand.calcReward())
+            return self.runtimeDelay <= 0 and self.schedulingDelay <= 0
         
-        return self.runtimeDelay <= 0 and self.schedulingDelay <= 0
+        elif self.runtimeDelay <= 0:
+            
+            state = Tensor(np.append(demand.getState().flatten(), self.config_queue.getDCT()))
+            action = select_action(self.policy, state)
+            self.policy.rewards.append(demand.calcReward() - self.baseline_reward.get())
+            return action
+        
+        else:
+            return False
         
         
     def scheduleDemand(self, demandMatrix):
