@@ -40,6 +40,7 @@ class Scheduler():
             
             state = Tensor(np.append(demand.getState().flatten(), self.config_queue.getDCT()))
             action = select_action(self.policy, state)
+            #print "the action: ", action
             self.policy.rewards.append(demand.calcReward() - self.baseline_reward.get())
             return action
         

@@ -12,13 +12,13 @@ import numpy as np
 import pickle
 import os
 
-switchRadix = 64
+switchRadix = 16
 reconfig_penalty = 25
-numEpisodes = 10
+numEpisodes = 1
 
 timeline_params = { 'switchRadix'     : switchRadix, 
                     'window_num'      : 5,
-                    'time_window'     : 1000,
+                    'time_window'     : 100,
                     'light_flows_num' : 12,
                     'heavy_flows_num' : 4,
                     'light_range'     : [1,16],
@@ -41,6 +41,7 @@ for episode in range(numEpisodes):
 
     print "Running episode #", episode
     
+    print "Trivial policy."    
     OCS_switch = Switch(switchRadix, reconfig_penalty, timeline_params)
     Results = {}
     
@@ -49,6 +50,7 @@ for episode in range(numEpisodes):
         
         if clock % 1000 == 0:
             print "clock: ", clock, " flowNumber: ", OCS_switch.demand.flowNumber
+            print "DCT: " , OCS_switch.switch_scheduler.config_queue.getDCT()
         
         OCS_switch.demand.update(clock)
         OCS_switch.switch_scheduler.update(clock)
@@ -63,11 +65,14 @@ for episode in range(numEpisodes):
     OCS_switch.switch_scheduler.policy = policy
     OCS_switch.demand.reset()
     
+    print "NN policy." 
+    
     clock = 0
     for i in range(OCS_switch.switch_scheduler.baseline_reward.qsize()):
         
         if clock % 1000 == 0:
             print "clock: ", clock, " flowNumber: ", OCS_switch.demand.flowNumber
+            print "DCT: " , OCS_switch.switch_scheduler.config_queue.getDCT()
         
         OCS_switch.demand.update(clock)
         OCS_switch.switch_scheduler.update(clock)
