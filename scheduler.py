@@ -11,7 +11,7 @@ from scheduler_c import lumos
 from configQueue import ConfigQueue
 from policy import select_action
 from torch import Tensor
-from Queue import Queue
+
 
 import numpy as np
 
@@ -28,12 +28,12 @@ class Scheduler():
         self.runtimeDelay = 0
         self.schedulingDelay = TRIVIAL
         self.policy = policy
-        self.baseline_reward = Queue()
+        self.baseline_reward = {}
          
-    def readyToSchedule(self, demand):
+    def readyToSchedule(self, demand, clock):
         
         if self.policy is None:
-            self.baseline_reward.put(demand.calcReward())
+            self.baseline_reward[clock] = demand.calcRunningReward()
             return self.runtimeDelay <= 0 and self.schedulingDelay <= 0
         
         elif self.runtimeDelay <= 0:
@@ -41,7 +41,7 @@ class Scheduler():
             state = Tensor(np.append(demand.getState().flatten(), self.config_queue.getDCT()))
             action = select_action(self.policy, state)
             #print "the action: ", action
-            self.policy.rewards.append(demand.calcReward() - self.baseline_reward.get())
+            self.policy.rewards.append(demand.calcRunningReward())# - self.baseline_reward[clock])
             return action
         
         else:

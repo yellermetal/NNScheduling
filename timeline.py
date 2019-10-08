@@ -98,16 +98,27 @@ class Timeline():
     def isEmpty(self):
         return self.flowNumber == 0
     
-    def calcReward(self):
+    def calcRunningReward(self):
         
         total_reward = 0
         
         for flow in self.flows:
             
             if flow.timestamp <= self.currTime:
-                total_reward = total_reward + flow.size - flow.remainingSize
+                total_reward -= self.currTime - flow.timestamp
                 
         return total_reward
+    
+    def termReward(self):
+        
+        total_reward = 0
+        
+        for flow in self.flows:
+            
+            total_reward -= flow.flowCompletionTime
+            
+        return total_reward 
+        
     
     def aggregateResults(self):
         return [flow.getStats() for flow in self.flows]

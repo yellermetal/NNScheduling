@@ -10,13 +10,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical
-
-
-gamma = 1
+import numpy as np
 
 def init_weights(m):
     if type(m) == nn.Linear:
-        torch.nn.init.xavier_uniform(m.weight)
+        torch.nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
         
         
@@ -58,10 +56,10 @@ class Policy(nn.Module):
         normalizer.observe(state)
         new_state = normalizer.normalize(state)
         
-        new_state = F.relu(self.in_layer(new_state))
-        new_state = F.relu(self.hidden_layer_1(new_state))
-        new_state = F.relu(self.hidden_layer_2(new_state))
-        return F.softmax(self.out_layer(new_state), dim=0)
+        new_state = torch.sigmoid(self.in_layer(new_state))
+        new_state = torch.sigmoid(self.hidden_layer_1(new_state))
+        new_state = torch.sigmoid(self.hidden_layer_2(new_state))
+        return F.softmax(torch.sigmoid(self.out_layer(new_state)), dim=0)
     
     
 
@@ -74,11 +72,11 @@ def select_action(policy, state):
     policy.saved_log_probs.append(m.log_prob(action))
     return action.item()
 
-def finish_episode(policy, optimizer, eps):
+def finish_episode(policy, optimizer, eps, gamma):
     R = 0
     policy_loss = []
     returns = []
-    for r in policy.rewards[::-1]:
+    for r in np.flip(policy.rewards):
         R = r + gamma * R
         returns.insert(0, R)
     returns = torch.tensor(returns)
@@ -91,14 +89,11 @@ def finish_episode(policy, optimizer, eps):
     optimizer.step()
     del policy.rewards[:]
     del policy.saved_log_probs[:]
+    
+
+    
+    
+    
+    
 
 
-        
-'''
-input_size = 4
-hidden_size = 4
-
-policy = Policy(input_size, hidden_size)
-optimizer = optim.Adam(policy.parameters(), lr=1e-2)
-eps = np.finfo(np.float32).eps.item()
-'''

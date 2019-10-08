@@ -14,7 +14,8 @@ import os
 
 switchRadix = 16
 reconfig_penalty = 25
-numEpisodes = 1
+numEpisodes = 10
+gamma = 0.1
 
 timeline_params = { 'switchRadix'     : switchRadix, 
                     'window_num'      : 5,
@@ -32,21 +33,24 @@ if os.path.isfile("NN_model.pickle"):
         policy = pickle.load(F)
 else:
     policy = Policy(input_size, hidden_size)
-optimizer = optim.Adam(policy.parameters(), lr=1)
+optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 eps = np.finfo(np.float32).eps.item()
 
 
 episodeResults = []
+Results = {}
+OCS_switch = Switch(switchRadix, reconfig_penalty, timeline_params)
 for episode in range(numEpisodes):
-
+    
     print "Running episode #", episode
     
-    print "Trivial policy."    
-    OCS_switch = Switch(switchRadix, reconfig_penalty, timeline_params)
-    Results = {}
-    
+    #print "Trivial policy."   
+
+
+    '''
     clock = 0
     while(not OCS_switch.demand.isEmpty()):
+        
         
         if clock % 1000 == 0:
             print "clock: ", clock, " flowNumber: ", OCS_switch.demand.flowNumber
@@ -61,14 +65,13 @@ for episode in range(numEpisodes):
     assert OCS_switch.demand.flowNumber == 0, "Finished, but flowNumber != 0"
     Results['baseline'] = { 'flow_number' : OCS_switch.demand.flowNumber, 
                             'flow_stats' : OCS_switch.demand.aggregateResults() }
-    
+    '''
     OCS_switch.switch_scheduler.policy = policy
-    OCS_switch.demand.reset()
     
-    print "NN policy." 
-    
+    print "NN policy."
+
     clock = 0
-    for i in range(OCS_switch.switch_scheduler.baseline_reward.qsize()):
+    while(not OCS_switch.demand.isEmpty()):
         
         if clock % 1000 == 0:
             print "clock: ", clock, " flowNumber: ", OCS_switch.demand.flowNumber
@@ -83,15 +86,15 @@ for episode in range(numEpisodes):
     Results['NN'] = { 'flow_number' : OCS_switch.demand.flowNumber, 
                       'flow_stats' : OCS_switch.demand.aggregateResults() }
         
-    finish_episode(policy, optimizer, eps)
+    finish_episode(policy, optimizer, eps, gamma)
     episodeResults.append(Results)
+    OCS_switch.demand.reset()
     
-    
-with open("NN_model.pickle", "wb") as F:
-    pickle.dump(policy, F)
+    with open("NN_model.pickle", "wb") as F:
+        pickle.dump(policy, F)
     
 with open("Train_results.pickle", "wb") as F:
-    pickle.dump(episodeResults, F)
+    pickle.dump(Results, F)
 
 
 
