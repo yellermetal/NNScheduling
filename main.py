@@ -40,9 +40,11 @@ eps = np.finfo(np.float32).eps.item()
 episodeResults = []
 Results = {}
 OCS_switch = Switch(switchRadix, reconfig_penalty, timeline_params)
-for episode in range(numEpisodes):
+episode = 0
+while(True):
     
     print "Running episode #", episode
+    episode += 1
     
     #print "Trivial policy."   
 
