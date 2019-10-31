@@ -40,4 +40,7 @@ def plot_FCTs(FlowCompletionTimes, label):
 plot_FCTs(baseline_FCTs, 'Baseline')
 plot_FCTs(NN_FCTs, 'Neural Network')
 plt.legend()
+
+plt.savefig("NN_results.jpg")
+
 plt.show()
